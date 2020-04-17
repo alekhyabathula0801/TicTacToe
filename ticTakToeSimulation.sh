@@ -47,3 +47,8 @@ printBoard(){
 
 resetBoard
 printBoard
+
+echo Choose your cell
+read -p "Enter row number " row
+read -p "Enter column number " column
+board[$row,$column]=X
