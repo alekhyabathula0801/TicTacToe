@@ -4,6 +4,11 @@ NUM_OF_ROWS=3
 NUM_OF_COLUMNS=3
 #variables
 declare -A board
+
+echo You are assigned with letter X
+player[1]=X
+player[2]=O
+
 resetBoard(){
 	for ((i=0;i<$NUM_OF_ROWS;i++))
 	do
