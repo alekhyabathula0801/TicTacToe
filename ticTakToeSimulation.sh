@@ -9,6 +9,14 @@ echo You are assigned with letter X
 player[1]=X
 player[2]=O
 
+toss=$((RANDOM%2))
+if [ $toss -eq 1 ]
+then
+	echo player 1 start the game
+else
+	echo player 2 start the game
+fi
+
 resetBoard(){
 	for ((i=0;i<$NUM_OF_ROWS;i++))
 	do
