@@ -4,6 +4,7 @@ NUM_OF_ROWS=3
 NUM_OF_COLUMNS=3
 #variables
 numOfTurns=0
+gameStatus=1
 declare -A board
 
 resetBoard(){
@@ -50,9 +51,7 @@ checkWinningConditions(){
 			done
 			if [ $count = $NUM_OF_COLUMNS ]
 			then
-				echo Game over player $player won
-				printBoard
-				exit;
+				gameStatus=0
 			fi
 		fi
 	done
@@ -73,9 +72,7 @@ checkWinningConditions(){
                         done
                 	if [ $count -eq $NUM_OF_ROWS ]
                 	then
-				echo Game over player $player won
-                        	printBoard
-				exit;
+				gameStatus=0
                 	fi
 		fi
         done
@@ -95,9 +92,7 @@ checkWinningConditions(){
 			done
                 	if [ $count -eq $NUM_OF_ROWS ]
                 	then
-				echo Game over player $player won
-				printBoard
-				exit;
+				gameStatus=0
                 	fi
         	fi
 
@@ -117,9 +112,7 @@ checkWinningConditions(){
 			done
                         if [ $count -eq $NUM_OF_ROWS ]
                         then
-				echo Game over player $player won
-                                printBoard
-				exit;
+				gameStatus=0
                         fi
 		fi
 	fi
@@ -152,15 +145,26 @@ resetBoard
 echo You are player 1 assigned with letter X
 letter[1]=X
 letter[2]=O
-echo ${symbol[1]}
 toss=$((RANDOM%2+1))
 player=$toss
+
 while true
 do
-	symbol=${letter[$player]}
-	echo player $player turn with symbol $symbol
-	numOfTurns=$(($numOfTurns+1))
-	chooseCell $symbol
+	if [ $player = 1 ]
+	then
+		echo player $player turn with symbol X
+		numOfTurns=$(($numOfTurns+1))
+		chooseCell X
+	else
+		echo computer turn with symbol O
+	fi
 	checkWinningConditions
+	if [ $gameStatus = 0 ]
+	then
+		echo Game over ... player $player won
+		exit;
+	else
+		player=$(($player%2+1))
+	fi
 
 done
