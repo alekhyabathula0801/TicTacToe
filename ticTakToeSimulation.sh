@@ -52,12 +52,12 @@ checkWinningConditions(){
 			if [ $count = $NUM_OF_COLUMNS ]
 			then
 				gameStatus=0
+				return;
 			fi
 		fi
 	done
 
 	#check column wise
-
         for (( columns=0; columns<$NUM_OF_COLUMNS; columns++ ))
         do
                 if [ ${board[0,$columns]} != "." ]
@@ -73,6 +73,7 @@ checkWinningConditions(){
                 	if [ $count -eq $NUM_OF_ROWS ]
                 	then
 				gameStatus=0
+				return;
                 	fi
 		fi
         done
@@ -93,6 +94,7 @@ checkWinningConditions(){
                 	if [ $count -eq $NUM_OF_ROWS ]
                 	then
 				gameStatus=0
+				return;
                 	fi
         	fi
 
@@ -112,13 +114,13 @@ checkWinningConditions(){
                         if [ $count -eq $NUM_OF_ROWS ]
                         then
 				gameStatus=0
+				return;
                         fi
 		fi
 	fi
 }
 
 computerMove(){
-	MoveOfComputer=0
 	#option 1 - check whether computer can win with a move
 	for (( row=0; row<$NUM_OF_ROWS; row++ ))
 	do
@@ -139,67 +141,64 @@ computerMove(){
 			fi
 		done
 	done
-        if [ $MoveOfComputer = 0 ]
+	#option 2 - check whether opponent win with a move and block it
+       	for (( row=0; row<$NUM_OF_ROWS; row++ ))
+        do
+                for (( column=0; column<$NUM_OF_COLUMNS; column++ ))
+                do
+                        if [ ${board[$row,$column]} = "." ]
+                       	then
+                               	board[$row,$column]=X
+                               	checkWinningConditions
+                               	if [ $gameStatus != 0 ]
+                               	then
+                                       	board[$row,$column]=.
+				else
+					board[$row,$column]=O
+					gameStatus=1
+					return;
+	                        fi
+                        fi
+                done
+        done
+	#option 3 - move to corners of board
+	if [ ${board[0,0]} = "." ]
+        then
+                board[0,0]=O
+		return
+	elif [ ${board[0,$(($NUM_OF_COLUMNS-1))]} = "." ]
+        then
+                board[0,$(($NUM_OF_COLUMNS-1))]=O
+		return
+	elif [ ${board[$(($NUM_OF_ROWS-1)),0]} = "." ]
+        then
+                board[$(($NUM_OF_ROWS-1)),0]=O
+		return
+	elif [ ${board[$(($NUM_OF_ROWS-1)),$(($NUM_OF_COLUMNS-1))]} = "." ]
 	then
-
-		#option 2 - check whether opponent win with a move and block it
-        	for (( row=0; row<$NUM_OF_ROWS; row++ ))
-        	do
-                	for (( column=0; column<$NUM_OF_COLUMNS; column++ ))
-                	do
-                        	if [ ${board[$row,$column]} = "." ]
-                        	then
-                                	board[$row,$column]=X
-                                	checkWinningConditions
-                                	if [ $gameStatus != 0 ]
-                                	then
-                                        	board[$row,$column]=.
-					else
-						board[$row,$column]=O
-						gameStatus=1
-						MoveOfComputer=1
-						break;
-                                	fi
-                        	fi
-                	done
-
-			if [ $MoveOfComputer = 1 ]
-			then
-				break;
-			fi
-
-        	done
+		board[$(($NUM_OF_ROWS-1)),$(($NUM_OF_COLUMNS-1))]=O
+                return
 	fi
-	#option 3 - move to corners if unoccupied
-        if [ $MoveOfComputer = 0 ]
-        then
-		if [ ${board[0,0]} = "." ]
-                then
-                	board[0,0]=O
-			MoveOfComputer=1
-		elif [ ${board[0,$(($NUM_OF_COLUMNS-1))]} = "." ]
-                then
-                        board[0,$(($NUM_OF_COLUMNS-1))]=O
-			MoveOfComputer=1
-		elif [ ${board[$(($NUM_OF_ROWS-1)),0]} = "." ]
-                then
-                        board[$(($NUM_OF_ROWS-1)),0]=O
-			MoveOfComputer=1
-		else
-			board[$(($NUM_OF_ROWS-1)),$(($NUM_OF_COLUMNS-1))]=O
-                        MoveOfComputer=1
-		fi
-	fi
-
 	# option 4 - move to centre
-	if [ $MoveOfComputer = 0 ]
+        if [ ${board[$(($NUM_OF_ROWS/2)),$(($NUM_OF_COLUMNS/2))]} = "." ]
         then
-                if [ ${board[$(($NUM_OF_ROWS/2)),$(($NUM_OF_COLUMNS/2))]} = "." ]
-                then
-			board[$(($NUM_OF_ROWS/2)),$(($NUM_OF_COLUMNS/2))]=O
-			MoveOfComputer=1
-		fi
+		board[$(($NUM_OF_ROWS/2)),$(($NUM_OF_COLUMNS/2))]=O
+		return
 	fi
+
+	#option 5 - move to sides of board
+	for (( rowss=0; rowss<$NUM_OF_ROWS; rowss++ ))
+        do
+               	for (( columnss=0; columnss<$NUM_OF_COLUMNS; columnss++ ))
+               	do
+                       	if [ ${board[$rowss,$columnss]} = "." ]
+                       	then
+                               	board[$rowss,$columnss]=O
+                               	return;
+			fi
+		done
+	done
+
 }
 
 chooseCell(){
