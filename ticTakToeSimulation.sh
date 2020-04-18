@@ -119,6 +119,7 @@ checkWinningConditions(){
 }
 
 computerMove(){
+	MoveOfComputer=0
 	#check whether computer can win with a move
 	for (( row=0; row<$NUM_OF_ROWS; row++ ))
 	do
@@ -132,12 +133,44 @@ computerMove(){
 				then
 					board[$row,$column]=.
 				else
-					break;
+					echo Game over ... player $player won
+                        		printBoard
+					exit
 				fi
 			fi
 		done
 	done
+        if [ $MoveOfComputer = 0 ]
+	then
 
+		#check whether opponent win with a move and block it
+        	for (( row=0; row<$NUM_OF_ROWS; row++ ))
+        	do
+                	for (( column=0; column<$NUM_OF_COLUMNS; column++ ))
+                	do
+                        	if [ ${board[$row,$column]} = "." ]
+                        	then
+                                	board[$row,$column]=X
+                                	checkWinningConditions
+                                	if [ $gameStatus != 0 ]
+                                	then
+                                        	board[$row,$column]=.
+					else
+						board[$row,$column]=O
+						gameStatus=1
+						MoveOfComputer=1
+						break;
+                                	fi
+                        	fi
+                	done
+
+			if [ $MoveOfComputer = 1 ]
+			then
+				break;
+			fi
+
+        	done
+	fi
 }
 
 chooseCell(){
