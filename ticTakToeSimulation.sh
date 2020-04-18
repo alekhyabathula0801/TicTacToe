@@ -119,7 +119,7 @@ checkWinningConditions(){
 
 computerMove(){
 	MoveOfComputer=0
-	#check whether computer can win with a move
+	#option 1 - check whether computer can win with a move
 	for (( row=0; row<$NUM_OF_ROWS; row++ ))
 	do
 		for (( column=0; column<$NUM_OF_COLUMNS; column++ ))
@@ -142,7 +142,7 @@ computerMove(){
         if [ $MoveOfComputer = 0 ]
 	then
 
-		#check whether opponent win with a move and block it
+		#option 2 - check whether opponent win with a move and block it
         	for (( row=0; row<$NUM_OF_ROWS; row++ ))
         	do
                 	for (( column=0; column<$NUM_OF_COLUMNS; column++ ))
@@ -170,7 +170,7 @@ computerMove(){
 
         	done
 	fi
-	#computer move to corners if unoccupied
+	#option 3 - move to corners if unoccupied
         if [ $MoveOfComputer = 0 ]
         then
 		if [ ${board[0,0]} = "." ]
@@ -191,6 +191,16 @@ computerMove(){
 		fi
 	fi
 
+	# option 4 - move to centre
+	if [ $MoveOfComputer = 0 ]
+        then
+echo .................................................
+                if [ ${board[$(($NUM_OF_ROWS/2)),$(($NUM_OF_COLUMNS/2))]} = "." ]
+                then
+			board[$(($NUM_OF_ROWS/2)),$(($NUM_OF_COLUMNS/2))]=O
+			MoveOfComputer=1
+		fi
+	fi
 }
 
 chooseCell(){
