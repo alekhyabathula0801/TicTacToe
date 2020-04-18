@@ -97,18 +97,17 @@ checkWinningConditions(){
         	fi
 
 		#check diagonal from top right to bottom left
-                columns1=$(($NUM_OF_COLUMNS-1))
-		columns2=$(($NUM_OF_COLUMNS-2))
-		if [ ${board[0,$columns1]} != "." ]
+		columns1=$(($NUM_OF_COLUMNS-2))
+		if [ ${board[0,$(($NUM_OF_COLUMNS-1))]} != "." ]
                 then
 			count=1
 			for (( rows=1; rows<$NUM_OF_ROWS; rows++ ))
                 	do
-                                if [ ${board[0,$columns1]} = ${board[$rows,$columns2]} ]
+                                if [ ${board[0,$(($NUM_OF_COLUMNS-1))]} = ${board[$rows,$columns1]} ]
                                 then
                                         ((count++))
                                 fi
-				columns2=$(($columns2-1))
+				columns1=$(($columns1-1))
 			done
                         if [ $count -eq $NUM_OF_ROWS ]
                         then
@@ -171,6 +170,27 @@ computerMove(){
 
         	done
 	fi
+	#computer move to corners if unoccupied
+        if [ $MoveOfComputer = 0 ]
+        then
+		if [ ${board[0,0]} = "." ]
+                then
+                	board[0,0]=O
+			MoveOfComputer=1
+		elif [ ${board[0,$(($NUM_OF_COLUMNS-1))]} = "." ]
+                then
+                        board[0,$(($NUM_OF_COLUMNS-1))]=O
+			MoveOfComputer=1
+		elif [ ${board[$(($NUM_OF_ROWS-1)),0]} = "." ]
+                then
+                        board[$(($NUM_OF_ROWS-1)),0]=O
+			MoveOfComputer=1
+		else
+			board[$(($NUM_OF_ROWS-1)),$(($NUM_OF_COLUMNS-1))]=O
+                        MoveOfComputer=1
+		fi
+	fi
+
 }
 
 chooseCell(){
