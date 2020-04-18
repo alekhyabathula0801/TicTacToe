@@ -116,13 +116,27 @@ checkWinningConditions(){
                         fi
 		fi
 	fi
+}
 
-	#condition for draw match
-	if [ $numOfTurns = $(($NUM_OF_ROWS*$NUM_OF_COLUMNS)) ]
-	then
-		echo Game over ..... Draw match
-		exit;
-	fi
+computerMove(){
+	#check whether computer can win with a move
+	for (( row=0; row<$NUM_OF_ROWS; row++ ))
+	do
+		for (( column=0; column<$NUM_OF_COLUMNS; column++ ))
+		do
+			if [ ${board[$row,$column]} = "." ]
+			then
+				board[$row,$column]=O
+				checkWinningConditions
+				if [ $gameStatus = 1 ]
+				then
+					board[$row,$column]=.
+				else
+					break;
+				fi
+			fi
+		done
+	done
 
 }
 
@@ -133,38 +147,45 @@ chooseCell(){
 	read -p "Enter column number " column
 	if [ ${board[$row,$column]} = "." ]
 	then
-		board[$row,$column]=$1
+		board[$row,$column]=X
 	else
 		echo invalid choice
-		chooseCell $symbol
+		chooseCell
 	fi
 
 }
-
-resetBoard
-echo You are player 1 assigned with letter X
-letter[1]=X
-letter[2]=O
-toss=$((RANDOM%2+1))
-player=$toss
-
-while true
-do
-	if [ $player = 1 ]
-	then
-		echo player $player turn with symbol X
+startTheGame(){
+	resetBoard
+	echo You are player 1 assigned with letter X
+	player=$((RANDOM%2+1))
+	echo Toss won by player $player
+	while true
+	do
 		numOfTurns=$(($numOfTurns+1))
-		chooseCell X
-	else
-		echo computer turn with symbol O
-	fi
-	checkWinningConditions
-	if [ $gameStatus = 0 ]
-	then
-		echo Game over ... player $player won
-		exit;
-	else
-		player=$(($player%2+1))
-	fi
+		if [ $player = 1 ]
+		then
+			echo player $player turn with symbol X
+			chooseCell
+		else
+			echo computer turn with symbol O
+			computerMove
+		fi
+		checkWinningConditions
+		if [ $gameStatus = 0 ]
+		then
+			echo Game over ... player $player won
+			printBoard
+			exit;
+		elif [ $numOfTurns = $(($NUM_OF_ROWS*$NUM_OF_COLUMNS)) ]
+        	then
+                	echo Game over ..... Draw match
+			printBoard
+			exit
+		else
+			player=$(($player%2+1))
+		fi
 
-done
+	done
+}
+
+startTheGame
