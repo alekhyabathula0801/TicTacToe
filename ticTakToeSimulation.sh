@@ -70,7 +70,7 @@ checkWinningConditions(){
 					((count++))
 				fi
                         done
-                	if [ $count -eq $NUM_OF_ROWS ]
+                	if [ $count = $NUM_OF_ROWS ]
                 	then
 				gameStatus=0
 				return;
@@ -86,12 +86,12 @@ checkWinningConditions(){
 			count=1
 			for (( rows=1; rows<$NUM_OF_ROWS; rows++ ))
 			do
-                               	if [ ${board[0,0]} == ${board[$rows,$rows]} ]
+                               	if [ ${board[0,0]} = ${board[$rows,$rows]} ]
 				then
                                		((count++))
 				fi
 			done
-                	if [ $count -eq $NUM_OF_ROWS ]
+                	if [ $count = $NUM_OF_ROWS ]
                 	then
 				gameStatus=0
 				return;
@@ -99,19 +99,19 @@ checkWinningConditions(){
         	fi
 
 		#check diagonal from top right to bottom left
-		columns1=$(($NUM_OF_COLUMNS-2))
+		tempColumn=$(($NUM_OF_COLUMNS-2))
 		if [ ${board[0,$(($NUM_OF_COLUMNS-1))]} != "." ]
                 then
 			count=1
 			for (( rows=1; rows<$NUM_OF_ROWS; rows++ ))
                 	do
-                                if [ ${board[0,$(($NUM_OF_COLUMNS-1))]} = ${board[$rows,$columns1]} ]
+                                if [ ${board[0,$(($NUM_OF_COLUMNS-1))]} = ${board[$rows,$tempColumn]} ]
                                 then
                                         ((count++))
                                 fi
-				columns1=$(($columns1-1))
+				tempColumn=$(($tempColumn-1))
 			done
-                        if [ $count -eq $NUM_OF_ROWS ]
+                        if [ $count = $NUM_OF_ROWS ]
                         then
 				gameStatus=0
 				return;
@@ -129,12 +129,14 @@ computerMove(){
 			if [ ${board[$row,$column]} = "." ]
 			then
 				board[$row,$column]=O
+				#invoke function to check winning condition
 				checkWinningConditions
 				if [ $gameStatus = 1 ]
 				then
 					board[$row,$column]=.
 				else
 					echo Game over ... player $player won
+					#invoke function to print board
                         		printBoard
 					exit
 				fi
@@ -149,6 +151,7 @@ computerMove(){
                         if [ ${board[$row,$column]} = "." ]
                        	then
                                	board[$row,$column]=X
+				#invoke function to check winning condition
                                	checkWinningConditions
                                	if [ $gameStatus != 0 ]
                                	then
@@ -179,21 +182,21 @@ computerMove(){
 		board[$(($NUM_OF_ROWS-1)),$(($NUM_OF_COLUMNS-1))]=O
                 return
 	fi
-	# option 4 - move to centre
+	# option 4 - move to centre of the board
         if [ ${board[$(($NUM_OF_ROWS/2)),$(($NUM_OF_COLUMNS/2))]} = "." ]
         then
 		board[$(($NUM_OF_ROWS/2)),$(($NUM_OF_COLUMNS/2))]=O
 		return
 	fi
 
-	#option 5 - move to sides of board
-	for (( rowss=0; rowss<$NUM_OF_ROWS; rowss++ ))
+	#option 5 - move across sides of the board
+	for (( row=0; row<$NUM_OF_ROWS; row++ ))
         do
-               	for (( columnss=0; columnss<$NUM_OF_COLUMNS; columnss++ ))
+               	for (( column=0; column<$NUM_OF_COLUMNS; column++ ))
                	do
-                       	if [ ${board[$rowss,$columnss]} = "." ]
+                       	if [ ${board[$row,$column]} = "." ]
                        	then
-                               	board[$rowss,$columnss]=O
+                               	board[$row,$column]=O
                                	return;
 			fi
 		done
@@ -202,6 +205,7 @@ computerMove(){
 }
 
 chooseCell(){
+	#invoke function to print board
 	printBoard
 	echo Choose your cell
 	read -p "Enter row number " row
@@ -211,41 +215,52 @@ chooseCell(){
 		board[$row,$column]=X
 	else
 		echo invalid choice
+		#invoke function to choose cell
 		chooseCell
 	fi
 
 }
+
 startTheGame(){
+	##invoke function to reset board
 	resetBoard
+	echo ----------------------
+	echo WELCOME TO TIC-TAC-TOE
+	echo ----------------------
 	echo You are player 1 assigned with letter X
 	player=$((RANDOM%2+1))
 	echo Toss won by player $player
+
 	while true
 	do
 		numOfTurns=$(($numOfTurns+1))
 		if [ $player = 1 ]
 		then
-			echo player $player turn with symbol X
+			echo Your turn with symbol X
+			#invoke function to choose cell
 			chooseCell
 		else
-			echo computer turn with symbol O
+			echo Computer turn with symbol O
+			#invoke funcion to choose cell by computer
 			computerMove
 		fi
+		#invoke function to check winning conditions
 		checkWinningConditions
 		if [ $gameStatus = 0 ]
 		then
 			echo Game over ... player $player won
+			#invoke function to print board
 			printBoard
 			exit;
 		elif [ $numOfTurns = $(($NUM_OF_ROWS*$NUM_OF_COLUMNS)) ]
         	then
                 	echo Game over ..... Draw match
+			#invoke function to print board
 			printBoard
 			exit
 		else
 			player=$(($player%2+1))
 		fi
-
 	done
 }
 
