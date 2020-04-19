@@ -8,28 +8,28 @@ gameStatus=1
 declare -A board
 
 resetBoard(){
-	for ((i=0;i<$NUM_OF_ROWS;i++))
+	for ((row=0;row<$NUM_OF_ROWS;row++))
 	do
-		for ((j=0;j<$NUM_OF_COLUMNS;j++))
+		for ((column=0;column<$NUM_OF_COLUMNS;column++))
 		do
-			board[$i,$j]=.
+			board[$row,$column]=.
 		done
 	done
 }
 
 printBoard(){
 	printf "%4s"
-	for ((i=0;i<$NUM_OF_COLUMNS;i++))
+	for ((column=0;column<$NUM_OF_COLUMNS;column++))
 	do
-    		printf "%2s" $i " "
+    		printf "%2s" $(($column+1)) " "
 	done
 	echo
-	for ((i=0;i<$NUM_OF_ROWS;i++))
+	for ((row=0;row<$NUM_OF_ROWS;row++))
 	do
-		printf  "%2s" $i " "
-		for ((j=0;j<$NUM_OF_COLUMNS;j++))
+		printf  "%2s" $(($row+1)) " "
+		for ((column=0;column<$NUM_OF_COLUMNS;column++))
 		do
-			printf "%2s" ${board[$i,$j]} " "
+			printf "%2s" ${board[$row,$column]} " "
 		done
 		echo
 	done
@@ -44,7 +44,7 @@ checkWinningConditions(){
 			count=1
 			for (( columns=1; columns<$NUM_OF_COLUMNS; columns++ ))
 			do
-				if [ ${board[$rows,0]} == ${board[$rows,$columns]} ]
+				if [ ${board[$rows,0]} = ${board[$rows,$columns]} ]
 				then
 					((count++))
 				fi
@@ -77,6 +77,7 @@ checkWinningConditions(){
                 	fi
 		fi
         done
+
 	#if board is square matrix then check diagonal elements
 	if [ $NUM_OF_ROWS = $NUM_OF_COLUMNS ]
 	then
@@ -118,9 +119,10 @@ checkWinningConditions(){
                         fi
 		fi
 	fi
+
 }
 
-computerMove(){
+findComputerMove(){
 	#option 1 - check whether computer can win with a move
 	for (( row=0; row<$NUM_OF_ROWS; row++ ))
 	do
@@ -169,26 +171,24 @@ computerMove(){
         then
                 board[0,0]=O
 		return
-	elif [ ${board[0,$(($NUM_OF_COLUMNS-1))]} = "." ]
-        then
-                board[0,$(($NUM_OF_COLUMNS-1))]=O
-		return
 	elif [ ${board[$(($NUM_OF_ROWS-1)),0]} = "." ]
         then
                 board[$(($NUM_OF_ROWS-1)),0]=O
 		return
+        elif [ ${board[0,$(($NUM_OF_COLUMNS-1))]} = "." ]
+        then
+                board[0,$(($NUM_OF_COLUMNS-1))]=O
+                return
 	elif [ ${board[$(($NUM_OF_ROWS-1)),$(($NUM_OF_COLUMNS-1))]} = "." ]
 	then
 		board[$(($NUM_OF_ROWS-1)),$(($NUM_OF_COLUMNS-1))]=O
                 return
-	fi
 	# option 4 - move to centre of the board
-        if [ ${board[$(($NUM_OF_ROWS/2)),$(($NUM_OF_COLUMNS/2))]} = "." ]
+        elif [ ${board[$(($NUM_OF_ROWS/2)),$(($NUM_OF_COLUMNS/2))]} = "." ]
         then
 		board[$(($NUM_OF_ROWS/2)),$(($NUM_OF_COLUMNS/2))]=O
 		return
 	fi
-
 	#option 5 - move across sides of the board
 	for (( row=0; row<$NUM_OF_ROWS; row++ ))
         do
@@ -201,28 +201,27 @@ computerMove(){
 			fi
 		done
 	done
-
 }
 
-chooseCell(){
+findPlayerMove(){
 	#invoke function to print board
 	printBoard
+	echo Your turn with letter X
 	echo Choose your cell
 	read -p "Enter row number " row
 	read -p "Enter column number " column
-	if [ ${board[$row,$column]} = "." ]
+	if [ ${board[$(($row-1)),$(($column-1))]} = "." ]
 	then
-		board[$row,$column]=X
+		board[$(($row-1)),$(($column-1))]=X
 	else
-		echo invalid choice
-		#invoke function to choose cell
-		chooseCell
+		echo ------ Invalid choice ------
+		#invoke function to find move of player
+		findPlayerMove
 	fi
-
 }
 
 startTheGame(){
-	##invoke function to reset board
+	#invoke function to reset board
 	resetBoard
 	echo ----------------------
 	echo WELCOME TO TIC-TAC-TOE
@@ -236,19 +235,19 @@ startTheGame(){
 		numOfTurns=$(($numOfTurns+1))
 		if [ $player = 1 ]
 		then
-			echo Your turn with symbol X
-			#invoke function to choose cell
-			chooseCell
+			#invoke function to find move of player
+			findPlayerMove
+	                #invoke function to check winning conditions
+        	        checkWinningConditions
 		else
-			echo Computer turn with symbol O
-			#invoke funcion to choose cell by computer
-			computerMove
+			echo Computer turn with letter O
+			#invoke funcion to find move of computer
+			findComputerMove
 		fi
-		#invoke function to check winning conditions
-		checkWinningConditions
+
 		if [ $gameStatus = 0 ]
 		then
-			echo Game over ... player $player won
+			echo Game over ... player $player  won
 			#invoke function to print board
 			printBoard
 			exit;
