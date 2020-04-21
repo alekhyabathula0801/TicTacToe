@@ -14,24 +14,44 @@ resetBoard(){
 	done
 }
 printBoard(){
-	echo -----------------
-	echo "   "TIC-TAC-TOE"   "
-	echo -----------------
-	printf "%4s"
-	for ((column=0;column<$numOfColumns;column++))
-	do
-    		printf "%2s" $(($column+1)) " "
-	done
-	echo
-	for ((row=0;row<$numOfRows;row++))
-	do
-		printf  "%2s" $(($row+1)) " "
-		for ((column=0;column<$numOfColumns;column++))
-		do
-			printf "%2s" ${board[$row,$column]} " "
-		done
-		echo
-	done
+        echo -------------------------------
+        echo "          "TIC-TAC-TOE
+        echo -------------------------------
+        for ((column=0;column<$(($numOfColumns+1));column++))
+        do
+                printf ________
+        done
+        echo
+        printf "%7s"
+        for ((column=0;column<$numOfColumns;column++))
+        do
+                printf "%2s" \| "  "
+                printf "%2s" $(($column+1)) "  "
+        done
+        printf "%2s" \| " "
+        echo
+        for ((column=0;column<$(($numOfColumns+1));column++))
+        do
+                printf ________
+        done
+        echo
+        for ((row=0;row<$numOfRows;row++))
+        do
+                printf  "%3s" $(($row+1)) "  "
+                printf  "%1s" " "
+                for ((column=0;column<$numOfColumns;column++))
+                do
+                        printf "%2s" \| "  "
+                        printf "%2s" ${board[$row,$column]} "  "
+                done
+                printf "%2s" \| "  "
+                echo
+                for ((column=0;column<$(($numOfColumns+1));column++))
+                do
+                        printf ________
+                done
+                echo
+        done
 }
 checkRowWise(){
         for (( rows=0; rows<$numOfRows; rows++ ))
@@ -153,9 +173,9 @@ findWinningMove(){
                                         #invoke function to print board
                                         printBoard
                                         echo Game over
-                                        echo ----------------------
-                                        echo "  "Player $player won"  "
-                                        echo ----------------------
+                                        echo --------------------------
+                                        echo "       "Player $player won
+                                        echo --------------------------
                                         exit
                                 fi
                         fi
@@ -262,14 +282,14 @@ findPlayerMove(){
 		then
 			board[$(($row-1)),$(($column-1))]=$1
 		else
-			echo ------ Invalid choice ------
+			echo ---------- Invalid choice ----------
 			echo Your choice is occupied
 			echo Enter a valid choice
 			#invoke function to find move of player
 			findPlayerMove ${letter[$player]}
 		fi
 	else
-                echo ------ Invalid choice ------
+                echo ---------- Invalid choice ----------
 		echo Your choice is out of range
 		echo Enter a valid choice
 		#invoke function to find move of player
@@ -282,18 +302,18 @@ checkGameStatus(){
 		#invoke function to print board
                 printBoard
 		echo Game over
-                echo ----------------------
-                echo "  "Player $player won"  "
-                echo ----------------------
+                echo --------------------------
+                echo "       "Player $player won
+                echo --------------------------
                 exit;
 	elif [ $numOfTurns = $(($numOfRows*$numOfColumns)) ]
         then
         	#invoke function to print board
                 printBoard
                 echo Game over
-                echo ----------------------
-                echo "      "Draw Match"      "
-                echo ----------------------
+                echo --------------------------
+                echo "        "Draw Match
+                echo --------------------------
                 exit
 	else
                 player=$(($player%2+1))
@@ -355,7 +375,7 @@ startTheGame(){
 			doublePlayerGame
 		;;
 		*)
-			echo Invalid choice
+			echo --------------- Invalid choice ---------------
 			startTheGame
 		;;
 	esac
